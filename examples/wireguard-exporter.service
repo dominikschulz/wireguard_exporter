@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/local/bin/wireguard_exporter -wireguard.peer-file /etc/wireguard/peers.toml
+ExecStart=/usr/local/bin/wireguard-exporter -wireguard.peer-file /etc/wireguard/peers.toml
 
 [Install]
 WantedBy=multi-user.target
