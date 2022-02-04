@@ -1,1 +1,2 @@
 cmd/wireguard_exporter/wireguard_exporter
+dist/

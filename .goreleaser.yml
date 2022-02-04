@@ -1,0 +1,61 @@
+# goreleaser.yml
+# Release automation
+#
+# Build customization
+project_name: wireguard-exporter
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: wireguard-exporter
+    binary: wireguard-exporter
+    main: ./cmd/wireguard_exporter/
+    flags:
+      - -trimpath
+      - -tags=netgo
+    env:
+      - CGO_ENABLED=0
+      - GOAMD64=v2
+    asmflags:
+      - all=-trimpath={{.Env.GOPATH}}
+    gcflags:
+      - all=-trimpath={{.Env.GOPATH}}
+    ldflags: |
+      -s -w -extldflags '-static'
+    goos:
+      - linux
+    goarch:
+      - amd64
+    mod_timestamp: '{{ .CommitTimestamp }}'
+archives:
+  - id: wireguard-exporter
+    name_template: "{{.Binary}}-{{.Version}}-{{.Os}}-{{.Arch}}{{ if .Arm }}v{{.Arm }}{{ end }}"
+    format: tar.gz
+    files:
+      - README.md
+      - examples/wireguard-exporter.service
+      - examples/peers.toml
+
+nfpms:
+  - id: wireguard-exporter_deb
+    vendor: wireguard-exporter Authors
+    homepage: "https://www.wireguard-exporter.pw"
+    maintainer: "wireguard-exporter Authors <wireguard-exporter@wireguard-exporter.pw>"
+    license: MIT
+    formats:
+      - deb
+    contents:
+      - src: examples/wireguard-exporter.service
+        dst: /etc/systemd/system/wireguard-exporter.service
+      - src: examples/peers.toml
+        dst: /etc/wireguard/peers.toml
+        type: config
+
+source:
+  enabled: true
+  name_template: "{{.ProjectName}}-{{.Version}}"
+  
+checksum:
+  name_template: "{{.ProjectName}}_{{.Version}}_SHA256SUMS"
